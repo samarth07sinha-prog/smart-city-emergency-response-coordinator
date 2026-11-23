@@ -1,0 +1,408 @@
+{
+  "schema_version": "1.0",
+  "name": "Demo City (fictional)",
+  "description": "Synthetic roads and services, not an actual city's emergency infrastructure. L20 is deliberately isolated.",
+  "locations": [
+    {
+      "id": "L01",
+      "name": "Central Hospital",
+      "lat": 12.98,
+      "lon": 77.58
+    },
+    {
+      "id": "L02",
+      "name": "Civic Square",
+      "lat": 12.98,
+      "lon": 77.588
+    },
+    {
+      "id": "L03",
+      "name": "North School",
+      "lat": 12.98,
+      "lon": 77.596
+    },
+    {
+      "id": "L04",
+      "name": "Market Street",
+      "lat": 12.98,
+      "lon": 77.604
+    },
+    {
+      "id": "L05",
+      "name": "Fire Station",
+      "lat": 12.98,
+      "lon": 77.612
+    },
+    {
+      "id": "L06",
+      "name": "West Clinic",
+      "lat": 12.972,
+      "lon": 77.58
+    },
+    {
+      "id": "L07",
+      "name": "Library",
+      "lat": 12.972,
+      "lon": 77.588
+    },
+    {
+      "id": "L08",
+      "name": "Bus Terminal",
+      "lat": 12.972,
+      "lon": 77.596
+    },
+    {
+      "id": "L09",
+      "name": "University",
+      "lat": 12.972,
+      "lon": 77.604
+    },
+    {
+      "id": "L10",
+      "name": "East Park",
+      "lat": 12.972,
+      "lon": 77.612
+    },
+    {
+      "id": "L11",
+      "name": "Police Station",
+      "lat": 12.964,
+      "lon": 77.58
+    },
+    {
+      "id": "L12",
+      "name": "Community Hall",
+      "lat": 12.964,
+      "lon": 77.588
+    },
+    {
+      "id": "L13",
+      "name": "City Mall",
+      "lat": 12.964,
+      "lon": 77.596
+    },
+    {
+      "id": "L14",
+      "name": "Stadium",
+      "lat": 12.964,
+      "lon": 77.604
+    },
+    {
+      "id": "L15",
+      "name": "Industrial Estate",
+      "lat": 12.964,
+      "lon": 77.612
+    },
+    {
+      "id": "L16",
+      "name": "South Hospital",
+      "lat": 12.956,
+      "lon": 77.58
+    },
+    {
+      "id": "L17",
+      "name": "Residential West",
+      "lat": 12.956,
+      "lon": 77.588
+    },
+    {
+      "id": "L18",
+      "name": "Railway Station",
+      "lat": 12.956,
+      "lon": 77.596
+    },
+    {
+      "id": "L19",
+      "name": "Residential East",
+      "lat": 12.956,
+      "lon": 77.604
+    },
+    {
+      "id": "L20",
+      "name": "Island Outpost",
+      "lat": 12.956,
+      "lon": 77.612
+    }
+  ],
+  "roads": [
+    {
+      "id": "R01",
+      "source": "L01",
+      "target": "L02",
+      "distance_km": 1.0402,
+      "blocked": false
+    },
+    {
+      "id": "R02",
+      "source": "L01",
+      "target": "L06",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R03",
+      "source": "L02",
+      "target": "L03",
+      "distance_km": 1.1702,
+      "blocked": false
+    },
+    {
+      "id": "R04",
+      "source": "L02",
+      "target": "L07",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R05",
+      "source": "L03",
+      "target": "L04",
+      "distance_km": 1.3002,
+      "blocked": false
+    },
+    {
+      "id": "R06",
+      "source": "L03",
+      "target": "L08",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R07",
+      "source": "L04",
+      "target": "L05",
+      "distance_km": 1.0402,
+      "blocked": false
+    },
+    {
+      "id": "R08",
+      "source": "L04",
+      "target": "L09",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R09",
+      "source": "L05",
+      "target": "L10",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R10",
+      "source": "L06",
+      "target": "L07",
+      "distance_km": 1.3003,
+      "blocked": false
+    },
+    {
+      "id": "R11",
+      "source": "L06",
+      "target": "L11",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R12",
+      "source": "L07",
+      "target": "L08",
+      "distance_km": 1.0402,
+      "blocked": false
+    },
+    {
+      "id": "R13",
+      "source": "L07",
+      "target": "L12",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R14",
+      "source": "L08",
+      "target": "L09",
+      "distance_km": 1.1703,
+      "blocked": false
+    },
+    {
+      "id": "R15",
+      "source": "L08",
+      "target": "L13",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R16",
+      "source": "L09",
+      "target": "L10",
+      "distance_km": 1.3003,
+      "blocked": false
+    },
+    {
+      "id": "R17",
+      "source": "L09",
+      "target": "L14",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R18",
+      "source": "L10",
+      "target": "L15",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R19",
+      "source": "L11",
+      "target": "L12",
+      "distance_km": 1.1703,
+      "blocked": false
+    },
+    {
+      "id": "R20",
+      "source": "L11",
+      "target": "L16",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R21",
+      "source": "L12",
+      "target": "L13",
+      "distance_km": 1.3003,
+      "blocked": false
+    },
+    {
+      "id": "R22",
+      "source": "L12",
+      "target": "L17",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R23",
+      "source": "L13",
+      "target": "L14",
+      "distance_km": 1.0403,
+      "blocked": false
+    },
+    {
+      "id": "R24",
+      "source": "L13",
+      "target": "L18",
+      "distance_km": 1.112,
+      "blocked": false
+    },
+    {
+      "id": "R25",
+      "source": "L14",
+      "target": "L15",
+      "distance_km": 1.1703,
+      "blocked": false
+    },
+    {
+      "id": "R26",
+      "source": "L14",
+      "target": "L19",
+      "distance_km": 1.2899,
+      "blocked": false
+    },
+    {
+      "id": "R27",
+      "source": "L16",
+      "target": "L17",
+      "distance_km": 1.0403,
+      "blocked": false
+    },
+    {
+      "id": "R28",
+      "source": "L17",
+      "target": "L18",
+      "distance_km": 1.1703,
+      "blocked": false
+    },
+    {
+      "id": "R29",
+      "source": "L18",
+      "target": "L19",
+      "distance_km": 1.3004,
+      "blocked": false
+    },
+    {
+      "id": "R30",
+      "source": "L01",
+      "target": "L07",
+      "distance_km": 1.4284,
+      "blocked": false
+    },
+    {
+      "id": "R31",
+      "source": "L07",
+      "target": "L13",
+      "distance_km": 1.4657,
+      "blocked": false
+    },
+    {
+      "id": "R32",
+      "source": "L08",
+      "target": "L14",
+      "distance_km": 1.4905,
+      "blocked": false
+    },
+    {
+      "id": "R33",
+      "source": "L13",
+      "target": "L19",
+      "distance_km": 1.4284,
+      "blocked": false
+    }
+  ],
+  "vehicles": [
+    {
+      "id": "AMB-01",
+      "type": "ambulance",
+      "location_id": "L01",
+      "available": true
+    },
+    {
+      "id": "AMB-02",
+      "type": "ambulance",
+      "location_id": "L16",
+      "available": true
+    },
+    {
+      "id": "AMB-03",
+      "type": "ambulance",
+      "location_id": "L14",
+      "available": false
+    },
+    {
+      "id": "FIRE-01",
+      "type": "fire_engine",
+      "location_id": "L05",
+      "available": true
+    },
+    {
+      "id": "FIRE-02",
+      "type": "fire_engine",
+      "location_id": "L15",
+      "available": true
+    },
+    {
+      "id": "POL-01",
+      "type": "police",
+      "location_id": "L11",
+      "available": true
+    },
+    {
+      "id": "POL-02",
+      "type": "police",
+      "location_id": "L08",
+      "available": true
+    }
+  ],
+  "default_incident": {
+    "type": "medical",
+    "location_id": "L14"
+  }
+}
