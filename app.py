@@ -1,23 +1,21 @@
 """Run with python -m streamlit run app.py."""
 
-from pathlib import Path
-
-import folium
 import streamlit as st
 from streamlit_folium import st_folium
 
 from core import build_graph, find_route, load_sample_data, load_varanasi_data, plan_dispatch
 from core.graph import straight_line_km
+from ui.maps import city_deck, city_scene, street_map
+from ui.theme import heading, queue_item, summary
 
 
 st.set_page_config(page_title="Dispatch Atlas", layout="wide")
 state = st.session_state
-snapshot = Path(__file__).parent / "data" / "varanasi.local.json"
-cities = ["Varanasi", "Sample city"] if snapshot.exists() else ["Sample city"]
-city = st.sidebar.selectbox("Road network", cities, key="city_picker")
-if not snapshot.exists():
-    st.sidebar.caption("For Varanasi, install requirements-map.txt and run python -m core.varanasi.")
-reset = st.sidebar.button("Reset scenario")
+masthead = st.container()
+network_col, strategy_col, controls_col = st.columns([1, 1.5, 1], vertical_alignment="bottom")
+city = network_col.selectbox("Road network", ["Varanasi", "Sample city"], key="city_picker")
+controls = controls_col.popover("Fleet & display", icon=":material/tune:", width="stretch")
+reset = controls.button("Reset scenario")
 if reset or state.get("active_city") != city:
     generation = state.get("generation", 0) + 1
     for key in list(state):
@@ -41,73 +39,73 @@ if state.graph is None:
 graph = state.graph
 names = {n: a["name"] for n, a in graph.nodes(data=True)}
 
-def point(node):
-    return [graph.nodes[node]["lat"], graph.nodes[node]["lon"]]
-
-st.sidebar.subheader("Available fleet")
+controls.markdown("**Available fleet**")
 vehicles = [
-    dict(v, available=st.sidebar.checkbox(v["id"], value=v["available"], key=f"{city}-{v['id']}"))
+    dict(v, available=controls.checkbox(v["id"], value=v["available"], key=f"{city}-{v['id']}"))
     for v in data["vehicles"]
 ]
-st.title("Dispatch Atlas")
-st.caption(f"{city}  /  Emergency response simulation")
+with masthead:
+    heading(city)
 plans = plan_dispatch(graph, vehicles, state.calls)
-cols = st.columns(3)
-for col, key, label in zip(cols, ("greedy", "optimized"), ("Nearest-first", "Fleet optimum")):
-    plan = plans[key]
-    col.metric(label, f"{plan['total_distance_km']:.2f} km",
-               f"{plan['served_count']} of {len(state.calls)} calls covered", delta_color="off")
-cols[2].metric("Available units", f"{sum(v['available'] for v in vehicles)} / {len(vehicles)}")
-mode = st.radio("Map assignment", ["Optimized", "Nearest-first"], horizontal=True)
+mode = strategy_col.segmented_control("Dispatch strategy", ["Optimized", "Nearest-first"], default="Optimized",
+                            required=True, key="strategy")
 plan = plans["optimized" if mode == "Optimized" else "greedy"]
-m = folium.Map(location=data.get("map_center", point(state.calls[0]["location_id"])
-               if state.calls else point(next(iter(graph)))), zoom_start=14, control_scale=True)
-colors = ["#007e80", "#bf551a", "#604ab2", "#1e63a5"]
-if city == "Sample city":
-    for r in data["roads"]:
-        folium.PolyLine([point(r["source"]), point(r["target"])], color="#86949c",
-                        weight=2).add_to(m)
-for r in data["roads"]:
-    if r["blocked"] or r["id"] in state.closures:
-        folium.PolyLine([point(r["source"]), point(r["target"])], color="#af2546",
-                        weight=5, dash_array="6 6", tooltip="Closed segment").add_to(m)
-for i, assignment in enumerate(plan["assignments"]):
-    if len(assignment["route"]) > 1:
-        folium.PolyLine([point(n) for n in assignment["route"]], weight=5,
-                        color=colors[i % len(colors)],
-                        tooltip=f"{assignment['vehicle_id']} → {assignment['incident_id']}").add_to(m)
-for v in vehicles:
-    folium.CircleMarker(point(v["location_id"]), radius=7, fill=True, fill_opacity=1,
-                        color="#164a67" if v["available"] else "#89939b",
-                        tooltip=v["id"]).add_to(m)
-for call in state.calls:
-    folium.Marker(point(call["location_id"]), tooltip=f"{call['id']} · {call['type']}").add_to(m)
+summary(plans, plan, state.calls, vehicles)
 
-left, right = st.columns([2, 1])
-with left:
-    st.caption("Pins mark calls. Circles mark units. Click the map to place a new call.")
-    event = st_folium(m, height=450, use_container_width=True, key=f"map-{city}-{state.generation}",
-                      returned_objects=["last_clicked"])
-with right:
+left, right = st.columns([2.45, 1], gap="medium")
+with left, st.container(key="scene_panel"):
+    modes = ["3D city", "Street map"] if city == "Varanasi" else ["Street map"]
+    title, tools, focus = st.columns([1, 1.2, 1.2], vertical_alignment="bottom")
+    title.subheader("City map")
+    view = tools.segmented_control("Map view", modes, default=modes[0], required=True)
+    nearest = None
+    if view == "3D city":
+        camera = focus.selectbox("Camera", ["Overview", "Ghats", *[c["id"] for c in state.calls]])
+        buildings = controls.toggle("Show 3D buildings", value=True)
+        deck = city_deck(graph, data, vehicles, state.calls, plan, state.closures, camera, buildings)
+        st.pydeck_chart(deck, key=f"city3d-{state.generation}-{camera}", height=485,
+                        alt="Varanasi street network with buildings, assigned routes, units and incidents")
+        st.caption("Drag to pan · Shift-drag to rotate · Scroll to zoom. Use Street map to place a call by clicking.")
+    else:
+        focus.caption("Click the street map to position a new incident.")
+        m = street_map(graph, data, vehicles, state.calls, plan, state.closures)
+        event = st_folium(m, height=485, use_container_width=True, key=f"map-{city}-{state.generation}",
+                          returned_objects=["last_clicked"])
+        click = (event or {}).get("last_clicked")
+        if click:
+            nearest = min(graph, key=lambda n: straight_line_km(
+                {"lat": click["lat"], "lon": click["lng"]}, graph.nodes[n]))
+    st.html("""<div class="atlas-legend"><span><i style="background:#219a80"></i>Available unit</span>
+        <span><i style="background:#ff7e56"></i>Incident</span>
+        <span><i style="background:#9298a0"></i>Busy unit</span>
+        <span><i style="background:#e95563"></i>Closure</span></div>""")
+    if city == "Varanasi":
+        st.caption("[© OpenStreetMap contributors](https://www.openstreetmap.org/copyright) · "
+                   "Footprints: [Overture Maps](https://overturemaps.org/attribution/), Google, Microsoft and OSM. "
+                   "Missing heights are estimated.")
+
+with right, st.container(key="queue_panel"):
     st.subheader("Incident queue")
     assigned = {a["incident_id"]: a for a in plan["assignments"]}
     for call in state.calls:
-        assignment = assigned.get(call["id"])
-        st.markdown(f"**{call['id']}** · {call['type'].title()}")
-        st.caption(f"{assignment['vehicle_id']} · {assignment['distance_km']:.2f} km"
-                   if assignment else "Unassigned · no available reachable unit in this plan")
+        queue_item(call, assigned.get(call["id"]))
+    if not state.calls:
+        st.caption("No active calls. Add an incident below.")
     kind = st.selectbox("New call type", ["medical", "fire", "police"])
-    click = (event or {}).get("last_clicked")
-    if click:
-        nearest = min(graph, key=lambda n: straight_line_km(
-            {"lat": click["lat"], "lon": click["lng"]}, graph.nodes[n]))
+    if view == "3D city":
+        places = {p["label"]: p["position"] for p in city_scene()["places"]}
+        place = st.selectbox("Place near landmark", sorted(places), index=None,
+                             placeholder="Choose a Varanasi landmark")
+        if place:
+            lon, lat, _ = places[place]
+            nearest = min(graph, key=lambda n: straight_line_km(
+                {"lat": lat, "lon": lon}, graph.nodes[n]))
+    if nearest:
         st.caption(f"Selected junction · {names[nearest]}")
-    else:
-        nearest = None
     if city == "Sample city":
         nearest = st.selectbox("Call location", list(graph), index=list(graph).index(nearest)
                                if nearest else 0, format_func=names.get)
-    if st.button("Add incident", disabled=nearest is None):
+    if st.button("Add incident", disabled=nearest is None, type="primary", width="stretch"):
         state.calls.append({"id": f"CALL-{state.next_id}", "type": kind, "location_id": nearest})
         state.next_id += 1
         st.rerun()
@@ -147,5 +145,3 @@ with st.expander("Compare search algorithms"):
         st.caption("BFS minimizes hops. DFS follows its traversal order. UCS and A* minimize distance.")
     else:
         st.info("Assign a reachable unit to compare routes.")
-if city == "Varanasi":
-    st.caption("Road data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).")

@@ -133,8 +133,8 @@ When served counts differ, do not present total distance alone as a saving.
 
 ## Varanasi road network
 
-`load_varanasi_data()` reads the local snapshot produced by
-`python -m core.varanasi`. It raises FileNotFoundError if no snapshot exists.
+`load_varanasi_data()` prefers a local snapshot produced by
+`python -m core.varanasi` and falls back to the bundled road archive.
 The snapshot contains the standard locations, roads, vehicles, and default
 incident, plus `directed`, `map_center` (latitude and longitude),
 `showcase_incidents`, and attribution text and URL.

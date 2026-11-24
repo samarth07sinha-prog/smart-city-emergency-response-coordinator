@@ -41,13 +41,18 @@ From the project folder with the virtual environment created above:
 
 Open the local URL printed by Streamlit. Switch between nearest-first and
 optimized assignment, add or resolve calls, change vehicle availability, and
-close a route segment to recalculate dispatch. To enable the Varanasi option
-on a fresh checkout, generate the snapshot below and reload the app.
+close a route segment to recalculate dispatch. The bundled Varanasi scene
+opens on a fresh checkout. Select **Ghats** or a call in the camera menu to
+inspect an area in 3D, or use **Street map** to place calls by clicking.
+The WebGL scene includes roads, the Ganges, 37,531 building polygons and
+dispatch overlays. Use Shift-drag to orbit and scroll to zoom. Most building
+heights are estimates. See [map data and credits](data/ATTRIBUTION.md).
 
 ## Varanasi road network
 
-The optional Varanasi scenario uses real streets from a bounded central-city
-extract around the old city. The incidents and vehicle locations are simulated.
+The Varanasi scenario uses real streets from a bounded central-city extract
+around the old city. The incidents and vehicle locations are simulated.
+To refresh the bundled routing network with a local override, run:
 
 ```powershell
 .\.venv\Scripts\python.exe -m pip install -r requirements-map.txt
