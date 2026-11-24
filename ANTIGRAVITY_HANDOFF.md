@@ -1,7 +1,10 @@
 # Laptop 2 — Antigravity handoff
 
-Copy this project to Laptop 2 or obtain it through your shared Git repository.
-Open that project folder in Antigravity. Paste the prompt below.
+Clone the [shared GitHub repository](https://github.com/samarth07sinha-prog/smart-city-emergency-response-coordinator)
+and create the `codex/streamlit-ui` branch as described in
+[TEAM_HANDOFF.md](TEAM_HANDOFF.md). Open the cloned folder in Antigravity,
+paste the prompt below, and submit the finished work as a pull request into
+`main`.
 
 ---
 

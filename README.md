@@ -57,7 +57,7 @@ estimate arrival times. Runtime values are local measurements, not benchmarks.
 
 ## Collaboration
 
-Give Laptop 2 the entire source folder (or source ZIP), especially CONTRACT.md
-and ANTIGRAVITY_HANDOFF.md. Use separate Git branches if sharing one remote.
-Laptop 2 edits app.py, ui/, and requirements-ui.txt. Laptop 1 owns core and tests.
-No remote repository has been configured by this setup.
+Share the [GitHub repository](https://github.com/samarth07sinha-prog/smart-city-emergency-response-coordinator)
+and the [team handoff](TEAM_HANDOFF.md) with everyone. Each laptop clones the
+same repository, works on its assigned branch, and opens a pull request into
+`main`. Laptop 2 uses [the Antigravity prompt](ANTIGRAVITY_HANDOFF.md).
