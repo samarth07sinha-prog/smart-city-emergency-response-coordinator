@@ -87,7 +87,7 @@ nodes_expanded=1.
 
 `select_vehicle(graph, vehicles: list[dict], incident: dict) -> dict`
 
-Filters by incident type and availability, runs UCS from each candidate to the
+Filters by incident type and availability, runs one multi-source UCS to the
 incident, and selects the lowest reachable distance. Equal distances choose
 the lexicographically smaller vehicle id.
 
@@ -115,7 +115,8 @@ change availability. The UI should label its button **Find response vehicle**.
 `plan_dispatch(graph, vehicles, incidents)` is an optional addition to the v1
 API. Each incident uses the same `type` and `location_id` fields, plus a unique,
 nonempty string `id`. Invalid record values raise ValueError. The planner
-uses UCS for reachable, suitable, available vehicle-to-incident pairs.
+uses one multi-target UCS per distinct available origin and required vehicle type.
+It stops when all requested destinations settle or the frontier empties.
 
 The result has `greedy` and `optimized` plans. Greedy serves incidents in input
 order, choosing the nearest remaining vehicle (ties by vehicle ID).
@@ -129,6 +130,22 @@ and `distance_km`. Assignments and unassigned IDs follow incident input order.
 An empty plan has zero distance. This is a preview that leaves all inputs
 unchanged. Severity, travel times, and multi-stop dispatch are outside scope.
 When served counts differ, do not present total distance alone as a saving.
+
+## Varanasi road network
+
+`load_varanasi_data()` reads the local snapshot produced by
+`python -m core.varanasi`. It raises FileNotFoundError if no snapshot exists.
+The snapshot contains the standard locations, roads, vehicles, and default
+incident, plus `directed`, `map_center` (latitude and longitude),
+`showcase_incidents`, and attribution text and URL.
+
+Call `build_graph(locations, roads, directed=data.get("directed", False))`
+on every closure change. Directed road records run from source to target.
+Routes list every junction along the original street segments. Draw in that
+order. Parallel directed roads use the shortest open edge, breaking ties by
+ID. The chosen segment ID is available as `graph[source][target]["id"]`.
+A closure applies only to selected segment IDs, so a two-way closure must
+include both directions when present.
 
 ## UI agreement
 

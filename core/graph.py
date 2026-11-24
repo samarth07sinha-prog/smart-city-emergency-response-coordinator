@@ -1,4 +1,4 @@
-"""Validated, undirected road graph. Distances are kilometres."""
+"""Validated road graphs with distances in kilometres."""
 
 from math import asin, cos, isfinite, radians, sin, sqrt
 
@@ -25,14 +25,16 @@ def straight_line_km(a: dict, b: dict) -> float:
     return 6371.0088 * 2 * asin(min(1.0, sqrt(max(0.0, h))))
 
 
-def build_graph(locations: list[dict], roads: list[dict]) -> nx.Graph:
+def build_graph(locations: list[dict], roads: list[dict], *, directed: bool = False) -> nx.Graph:
     """Build a new graph; never mutate input. Blocked roads are omitted.
 
-    Invalid records raise ValueError. Parallel and self-loop roads are rejected.
+    Directed records allow travel from source to target only. For parallel
+    directed roads, use the shortest open edge (ties by road ID). Self-loops
+    and parallel undirected roads are rejected.
     The heuristic scale makes A* safe even for custom distances shorter than
     the geographical straight line. Call again whenever road state changes.
     """
-    graph = nx.Graph()
+    graph = nx.DiGraph() if directed else nx.Graph()
     for location in locations:
         node = _identifier(location.get("id"), "Location id")
         if node in graph:
@@ -53,18 +55,22 @@ def build_graph(locations: list[dict], roads: list[dict]) -> nx.Graph:
         if source not in graph or target not in graph:
             raise ValueError(f"Unknown endpoint for road {road_id}")
         pair = frozenset((source, target))
-        if road_id in seen_ids or pair in seen_pairs:
+        if road_id in seen_ids or (not directed and pair in seen_pairs):
             raise ValueError(f"Duplicate road id or endpoints: {road_id}")
         if source == target:
             raise ValueError("Self-loop roads are not supported")
         seen_ids.add(road_id)
-        seen_pairs.add(pair)
+        if not directed:
+            seen_pairs.add(pair)
         distance = _number(road.get("distance_km"), "Road distance")
         if distance <= 0:
             raise ValueError("Road distance must be positive")
         if type(road.get("blocked")) is not bool:
             raise ValueError("Road blocked must be a boolean")
         if not road["blocked"]:
+            previous = graph.get_edge_data(source, target)
+            if previous and (previous["distance_km"], previous["id"]) <= (distance, road_id):
+                continue
             graph.add_edge(source, target, id=road_id, distance_km=distance)
             direct = straight_line_km(graph.nodes[source], graph.nodes[target])
             if direct > 0:

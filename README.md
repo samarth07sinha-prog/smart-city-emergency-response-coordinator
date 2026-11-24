@@ -3,7 +3,7 @@
 ## Smart City Emergency Response Coordinator
 
 Working Python foundation for a college emergency response simulation.
-The interface and map are the next task for Antigravity. No UI is included yet.
+Dispatch Atlas is the integrated Streamlit map and fleet-planning dashboard.
 
 Included: a fictional city with 20 locations, 33 undirected roads, and seven
 vehicles; explicit BFS, DFS, UCS, and A*; UCS vehicle selection; blocked-road
@@ -30,6 +30,40 @@ Using the interpreter directly avoids PowerShell activation-policy changes.
 If the `py` launcher is unavailable, use `python -m venv .venv` after confirming
 `python --version` is 3.12.
 
+## Launch the dashboard
+
+From the project folder with the virtual environment created above:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-ui.txt
+.\.venv\Scripts\python.exe -m streamlit run app.py
+```
+
+Open the local URL printed by Streamlit. Switch between nearest-first and
+optimized assignment, add or resolve calls, change vehicle availability, and
+close a route segment to recalculate dispatch. To enable the Varanasi option
+on a fresh checkout, generate the snapshot below and reload the app.
+
+## Varanasi road network
+
+The optional Varanasi scenario uses real streets from a bounded central-city
+extract around the old city. The incidents and vehicle locations are simulated.
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements-map.txt
+.\.venv\Scripts\python.exe -m core.varanasi
+```
+
+This downloads a bounded OpenStreetMap extract, imports its driving streets
+with OSMnx, and generates `data/varanasi.local.json`.
+Keep that local snapshot for repeat demos. Routing after import needs no
+network access. Online background tiles are separate. The sample scenario
+remains available without an import. Varanasi routing respects one-way
+segments represented in the extract, without modeling turn restrictions,
+live traffic, or emergency vehicle exemptions.
+
+Road data © [OpenStreetMap contributors](https://www.openstreetmap.org/copyright).
+
 ## Files
 
 | Path | Purpose |
@@ -54,8 +88,7 @@ If the `py` launcher is unavailable, use `python -m venv .venv` after confirming
 5. Set all ambulance availability values to false to demonstrate
    no_suitable_vehicle.
 
-The functions do not write these changes back to JSON. The future UI will keep
-edits in Streamlit session state and provide a reset option.
+The functions do not write these changes back to JSON. The dashboard keeps edits in Streamlit session state and provides a reset option.
 
 This is classical graph-search AI using synthetic data. It does not train a
 machine-learning model, connect to emergency services, model traffic, or

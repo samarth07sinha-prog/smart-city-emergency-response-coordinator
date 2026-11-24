@@ -25,18 +25,16 @@ compatibility. Run `python -m unittest discover -s tests -v` and
 `python -m core.demo` in the configured environment. After merging the UI,
 run the integrated demo and record the checks performed and any open issues.
 
-## Laptop 2 — Streamlit interface and map
+## Laptop 2 — Optional visual review
 
-Branch: `codex/streamlit-ui`. Own `app.py`, `ui/`, and
-`requirements-ui.txt`. Paste [ANTIGRAVITY_HANDOFF.md](ANTIGRAVITY_HANDOFF.md)
-into Antigravity for the full implementation prompt, checks, and handoff.
+Run the existing dashboard, check route readability and narrow-screen layout,
+and submit any visual adjustments. See [the short handoff](ANTIGRAVITY_HANDOFF.md).
 
 ## Laptop 3 — QA and demo scenarios (if available)
 
 Branch: `codex/qa-demo`. Own `docs/QA_AND_DEMO.md`.
 
-Run the core demo now. Once Laptop 2 has a branch ready, test the UI on that
-branch. Cover normal dispatch, an unavailable ambulance, a blocked-road
+Run the core demo now. Test the dashboard in the integrated checkout. Cover normal dispatch, an unavailable ambulance, a blocked-road
 reroute, isolated L20, all suitable vehicles busy, and reset. Record the commit
 tested, steps, expected and actual results, and any reproducible bugs. Add a
 short demo script. Send core issues to Laptop 1 and UI issues to Laptop 2.

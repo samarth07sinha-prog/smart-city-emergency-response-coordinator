@@ -4,6 +4,8 @@ import unittest
 import networkx as nx
 
 from core import build_graph, find_route, load_sample_data, plan_dispatch, select_vehicle
+from core.varanasi import make_scenario
+from core.fleet_search import fleet_routes
 
 
 def fixture():
@@ -33,6 +35,52 @@ class CoreTests(unittest.TestCase):
             result = find_route(self.graph, "A", "C", alg)
             self.assertEqual(result["path"], ["A", "B", "C"])
             self.assertEqual(result["distance_km"], 2)
+
+    def test_fleet_search_directed_cutoffs_and_shared_origins(self):
+        graph = build_graph(self.locations, self.roads, directed=True)
+        origins = [("Z", "A"), ("B-unit", "B"), ("A-unit", "B")]
+        goals = ["A", "C", "D", "E"]
+        found = fleet_routes(graph, origins, goals)
+        for goal in goals:
+            reference = [(nx.shortest_path_length(graph, start, goal, weight="distance_km"), owner)
+                         for owner, start in origins if nx.has_path(graph, start, goal)]
+            if not reference:
+                self.assertNotIn(goal, found)
+                continue
+            route = found[goal]
+            self.assertEqual((route["distance_km"], route["vehicle_id"]), min(reference))
+            self.assertEqual(route["path"][0], dict(origins)[route["vehicle_id"]])
+            self.assertEqual(route["path"][-1], goal)
+            self.assertTrue(nx.is_path(graph, route["path"]))
+
+    def test_directed_routes_and_parallel_closure(self):
+        roads = [
+            {"id": "slow", "source": "A", "target": "B", "distance_km": 4, "blocked": False},
+            {"id": "fast", "source": "A", "target": "B", "distance_km": 1, "blocked": False},
+        ]
+        graph = build_graph(self.locations, roads, directed=True)
+        for algorithm in ("BFS", "DFS", "UCS", "A*"):
+            self.assertEqual(find_route(graph, "A", "B", algorithm)["distance_km"], 1)
+            self.assertEqual(find_route(graph, "B", "A", algorithm)["status"], "no_path")
+        roads[1]["blocked"] = True
+        graph = build_graph(self.locations, roads, directed=True)
+        result = select_vehicle(graph, self.vehicles, {"type": "medical", "location_id": "B"})
+        self.assertEqual(result["distance_km"], 4)
+        self.assertEqual(graph["A"]["B"]["id"], "slow")
+
+    def test_varanasi_import_preserves_direction_and_routes_presets(self):
+        streets = nx.MultiDiGraph()
+        for node in range(6):
+            streets.add_node(node, y=25.31, x=82.992 + node * 0.004)
+            streets.add_edge(node, (node + 1) % 6, length=500)
+        scenario = make_scenario(streets)
+        graph = build_graph(scenario["locations"], scenario["roads"],
+                            directed=scenario["directed"])
+        self.assertTrue(graph.has_edge("0", "1"))
+        self.assertFalse(graph.has_edge("1", "0"))
+        self.assertEqual(graph["0"]["1"]["distance_km"], 0.5)
+        plan = plan_dispatch(graph, scenario["vehicles"], scenario["showcase_incidents"])
+        self.assertEqual(plan["optimized"]["served_count"], 2)
 
     def test_dispatch_and_unavailable_nearest(self):
         self.assertEqual(select_vehicle(self.graph, self.vehicles, self.incident)["vehicle_id"], "AMB-2")

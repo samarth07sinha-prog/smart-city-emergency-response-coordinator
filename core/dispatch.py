@@ -3,7 +3,7 @@
 import networkx as nx
 
 from .graph import _identifier
-from .routing import find_route
+from .fleet_search import fleet_routes
 
 INCIDENT_VEHICLES = {"medical": "ambulance", "fire": "fire_engine", "police": "police"}
 
@@ -20,16 +20,12 @@ def select_vehicle(graph: nx.Graph, vehicles: list[dict], incident: dict) -> dic
     empty = {"vehicle_id": None, "route": [], "distance_km": None}
     if not candidates:
         return {"status": "no_suitable_vehicle", **empty}
-    best = None
-    for vehicle in candidates:
-        route = find_route(graph, vehicle["location_id"], goal, "UCS")
-        if route["status"] == "ok":
-            if best is None or route["distance_km"] < best["distance_km"]:
-                best = {
-                    "status": "ok", "vehicle_id": vehicle["id"],
-                    "route": route["path"], "distance_km": route["distance_km"],
-                }
-    return best if best is not None else {"status": "no_reachable_vehicle", **empty}
+    origins = [(v["id"], v["location_id"]) for v in candidates]
+    best = fleet_routes(graph, origins, [goal]).get(goal)
+    if best is None:
+        return {"status": "no_reachable_vehicle", **empty}
+    return {"status": "ok", "vehicle_id": best["vehicle_id"], "route": best["path"],
+            "distance_km": best["distance_km"]}
 
 
 def _incident_target(graph, incident):

@@ -6,7 +6,7 @@ import networkx as nx
 
 from .dispatch import _available_vehicles, _incident_target
 from .graph import _identifier
-from .routing import find_route
+from .fleet_search import fleet_routes
 
 
 def plan_dispatch(graph: nx.Graph, vehicles: list[dict], incidents: list[dict]) -> dict:
@@ -20,17 +20,20 @@ def plan_dispatch(graph: nx.Graph, vehicles: list[dict], incidents: list[dict]) 
         targets[incident_id] = _incident_target(graph, incident)
 
     options = {incident_id: {} for incident_id in targets}
-    route_cache = {}
+    goals_by_type = {}
     for incident_id, (vehicle_type, goal) in targets.items():
-        for vehicle in available:
-            if vehicle["type"] != vehicle_type:
-                continue
-            pair = (vehicle["location_id"], goal)
-            if pair not in route_cache:
-                route_cache[pair] = find_route(graph, *pair, "UCS")
-            route = route_cache[pair]
-            if route["status"] == "ok":
-                options[incident_id][vehicle["id"]] = route
+        goals_by_type.setdefault(vehicle_type, {}).setdefault(goal, []).append(incident_id)
+    origins = {}
+    for vehicle in available:
+        key = (vehicle["type"], vehicle["location_id"])
+        origins.setdefault(key, []).append(vehicle["id"])
+    for (vehicle_type, start), vehicle_ids in origins.items():
+        goals = goals_by_type.get(vehicle_type, {})
+        if goals:
+            routes = fleet_routes(graph, [(vehicle_ids[0], start)], goals)
+            for goal, route in routes.items():
+                for incident_id in goals[goal]:
+                    options[incident_id].update(dict.fromkeys(vehicle_ids, route))
 
     greedy, used = {}, set()
     for incident_id, routes in options.items():
