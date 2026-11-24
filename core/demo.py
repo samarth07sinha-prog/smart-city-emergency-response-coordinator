@@ -2,7 +2,7 @@
 
 import json
 
-from . import build_graph, find_route, load_sample_data, select_vehicle
+from . import build_graph, find_route, load_sample_data, plan_dispatch, select_vehicle
 
 
 def main():
@@ -17,8 +17,16 @@ def main():
             name: find_route(graph, start, incident["location_id"], name)
             for name in ("BFS", "DFS", "UCS", "A*")
         }
+    simultaneous = [
+        {"id": "MED-1", "type": "medical", "location_id": "L12"},
+        {"id": "MED-2", "type": "medical", "location_id": "L16"},
+    ]
     print(json.dumps({"incident": incident, "dispatch": selected,
-                      "algorithm_comparison": comparisons}, indent=2))
+                      "algorithm_comparison": comparisons,
+                      "simultaneous_incidents": simultaneous,
+                      "dispatch_comparison": plan_dispatch(
+                          graph, data["vehicles"], simultaneous
+                      )}, indent=2))
 
 
 if __name__ == "__main__":

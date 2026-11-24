@@ -3,7 +3,7 @@ import unittest
 
 import networkx as nx
 
-from core import build_graph, find_route, load_sample_data, select_vehicle
+from core import build_graph, find_route, load_sample_data, plan_dispatch, select_vehicle
 
 
 def fixture():
@@ -124,6 +124,27 @@ class CoreTests(unittest.TestCase):
         first = load_sample_data()
         first["vehicles"][0]["available"] = False
         self.assertTrue(load_sample_data()["vehicles"][0]["available"])
+
+    def test_simultaneous_dispatch_beats_nearest_first_on_sample_city(self):
+        data = load_sample_data()
+        graph = build_graph(data["locations"], data["roads"])
+        incidents = [
+            {"id": "MED-1", "type": "medical", "location_id": "L12"},
+            {"id": "MED-2", "type": "medical", "location_id": "L16"},
+            {"id": "MED-3", "type": "medical", "location_id": "L20"},
+        ]
+        before = copy.deepcopy((data["vehicles"], incidents))
+        plans = plan_dispatch(graph, data["vehicles"], incidents)
+        self.assertEqual(plans["greedy"]["served_count"], 2)
+        self.assertAlmostEqual(plans["greedy"]["total_distance_km"], 5.7962)
+        optimized = plans["optimized"]
+        self.assertEqual(optimized["served_count"], 2)
+        self.assertEqual(optimized["unassigned_incident_ids"], ["MED-3"])
+        self.assertAlmostEqual(optimized["total_distance_km"], 2.5404)
+        self.assertEqual([a["vehicle_id"] for a in optimized["assignments"]],
+                         ["AMB-01", "AMB-02"])
+        self.assertEqual(optimized["assignments"][1]["route"], ["L16"])
+        self.assertEqual((data["vehicles"], incidents), before)
 
 
 if __name__ == "__main__":

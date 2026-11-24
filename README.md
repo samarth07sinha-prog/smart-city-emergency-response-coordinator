@@ -9,6 +9,12 @@ Included: a fictional city with 20 locations, 33 undirected roads, and seven
 vehicles; explicit BFS, DFS, UCS, and A*; UCS vehicle selection; blocked-road
 support; unreachable-case handling; and automated tests.
 
+The core can also compare two plans for simultaneous incidents. Nearest-first
+chooses a vehicle for each incident in order. Min-cost maximum flow plans all
+assignments together, maximizing incidents served before minimizing distance.
+Run the CLI demo to see two medical calls served in **2.5404 km** with the
+optimized plan versus **5.7962 km** with nearest-first on the same sample city.
+
 ## Run on Windows
 
 Open a terminal **inside this project folder**. Use Python 3.12.

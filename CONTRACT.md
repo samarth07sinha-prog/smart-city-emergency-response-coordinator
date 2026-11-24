@@ -110,6 +110,26 @@ Invalid incident/vehicle record values raise ValueError.
 Selection is a preview: it does not mutate data, reserve a vehicle, move it, or
 change availability. The UI should label its button **Find response vehicle**.
 
+## Simultaneous dispatch planning
+
+`plan_dispatch(graph, vehicles, incidents)` is an optional addition to the v1
+API. Each incident uses the same `type` and `location_id` fields, plus a unique,
+nonempty string `id`. Invalid record values raise ValueError. The planner
+uses UCS for reachable, suitable, available vehicle-to-incident pairs.
+
+The result has `greedy` and `optimized` plans. Greedy serves incidents in input
+order, choosing the nearest remaining vehicle (ties by vehicle ID).
+Optimized uses min-cost maximum flow to assign as many incidents as possible
+and, among those plans, minimize total route distance. Each vehicle and
+incident can be assigned at most once. Equally optimal plans may differ.
+
+Both plans have `served_count`, `total_distance_km`, `unassigned_incident_ids`,
+and `assignments`. Each assignment has `incident_id`, `vehicle_id`, `route`,
+and `distance_km`. Assignments and unassigned IDs follow incident input order.
+An empty plan has zero distance. This is a preview that leaves all inputs
+unchanged. Severity, travel times, and multi-stop dispatch are outside scope.
+When served counts differ, do not present total distance alone as a saving.
+
 ## UI agreement
 
 Dispatch always uses UCS. Compare algorithms separately using the selected

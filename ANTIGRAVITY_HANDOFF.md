@@ -56,3 +56,24 @@ core tests after integration. Do not claim a check passed unless you ran it.
 Finish with a handoff to Laptop 1 listing changed files, dependency versions,
 run commands, checks actually performed, and unresolved issues. Keep your
 changes within your assigned files.
+
+## Showcase mode — Two calls come in
+
+Give the dashboard a map-first layout. Keep incident controls in a compact
+panel, use distinct vehicle and incident markers, and provide a readable
+legend. Use high-contrast colors and line styles for routes and closures.
+
+Add a multi-incident mode with an editable incident queue and a preset
+`MED-1: medical at L12`, then `MED-2: medical at L16`. Use `plan_dispatch`
+from core. Show nearest-first and optimized assignments side by side, with
+served count, total distance, and any unserved incidents. Let the viewer
+switch which plan is drawn on the map. Show a distance saving only when
+both plans serve the same number of incidents, and make the covered incidents
+explicit. With the preset, the optimized plan keeps AMB-02 at L16 for the
+second call, so AMB-01 can handle the first.
+
+Add a **Search replay** control only if the core provides actual search
+steps. For this version, show the four real routes as selectable overlays
+on the same map. Let the viewer block a road and recompute both dispatch
+plans. Verify that the preset serves two incidents in both plans, and that
+optimized totals 2.5404 km versus 5.7962 km before any edits.
