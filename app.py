@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 from core import build_graph, find_route, load_sample_data, load_varanasi_data, plan_dispatch
 from core.graph import straight_line_km
 from ui.maps import city_deck, city_scene, street_map
-from ui.theme import heading, queue_item, summary
+from ui.theme import comparison_table, heading, queue_item, summary
 
 
 st.set_page_config(page_title="Dispatch Atlas", layout="wide")
@@ -50,12 +50,12 @@ plans = plan_dispatch(graph, vehicles, state.calls)
 mode = strategy_col.segmented_control("Dispatch strategy", ["Optimized", "Nearest-first"], default="Optimized",
                             required=True, key="strategy")
 plan = plans["optimized" if mode == "Optimized" else "greedy"]
-summary(plans, plan, state.calls, vehicles)
+summary(plans, plan, state.calls, vehicles, active_mode=mode)
 
 left, right = st.columns([2.45, 1], gap="medium")
 with left, st.container(key="scene_panel"):
     modes = ["3D city", "Street map"] if city == "Varanasi" else ["Street map"]
-    title, tools, focus = st.columns([1, 1.2, 1.2], vertical_alignment="bottom")
+    title, tools, focus = st.columns([0.85, 1.5, 1.15], vertical_alignment="bottom")
     title.subheader("City map")
     view = tools.segmented_control("Map view", modes, default=modes[0], required=True)
     nearest = None
@@ -95,7 +95,7 @@ with right, st.container(key="queue_panel"):
     if view == "3D city":
         places = {p["label"]: p["position"] for p in city_scene()["places"]}
         place = st.selectbox("Place near landmark", sorted(places), index=None,
-                             placeholder="Choose a Varanasi landmark")
+                             placeholder="Choose a landmark")
         if place:
             lon, lat, _ = places[place]
             nearest = min(graph, key=lambda n: straight_line_km(
@@ -141,7 +141,7 @@ with st.expander("Compare search algorithms"):
             rows.append({"Algorithm": algorithm, "Distance (km)": round(result["distance_km"], 3),
                          "Nodes expanded": result["nodes_expanded"],
                          "Runtime (ms)": round(result["runtime_ms"], 2)})
-        st.dataframe(rows, hide_index=True)
+        comparison_table(rows)
         st.caption("BFS minimizes hops. DFS follows its traversal order. UCS and A* minimize distance.")
     else:
         st.info("Assign a reachable unit to compare routes.")

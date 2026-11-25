@@ -26,15 +26,19 @@ CSS = """
 .atlas-title h1{color:#f3faf6}.atlas-title h1 em{font-weight:400;color:#9ce6d5;font-style:normal}
 .atlas-title p{font-size:14px;color:#c2d9dc;margin:.4rem 0 0}
 .atlas-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.atlas-stat{background:white;padding:14px 18px}.atlas-stat:first-child{background:#193441;color:white}
+.atlas-stat{background:white;padding:14px 18px}.atlas-stat.is-active{background:#193441;color:white}
 .atlas-stat span,.atlas-stat small{display:block}.atlas-stat span{font:650 12px/1.4 "Segoe UI",sans-serif}
 .atlas-stat strong{display:block;font:650 clamp(23px,2.3vw,34px)/1.2 "Segoe UI",sans-serif;letter-spacing:-.055em;margin:3px 0}
-.atlas-stat small{font-size:12px;color:var(--muted)}.atlas-stat:first-child small{color:#b4d5d0}
+.atlas-stat small{font-size:12px;color:var(--muted)}.atlas-stat.is-active small{color:#b4d5d0}
 .call-row{padding:11px 0;border-bottom:1px solid #dce3df;color:var(--ink);line-height:1.35}
 .call-row b{font:700 14px/1.4 Consolas,monospace}.call-kind{float:right;font-size:12px;color:#506775}
 .call-detail{font-size:13px;margin-top:3px;color:#395564}
 .atlas-legend{display:flex;flex-wrap:wrap;gap:8px 16px;font-size:12px;color:var(--muted)}
 .atlas-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+.atlas-table{width:100%;border-collapse:collapse;font-size:13px;margin:.25rem 0 .5rem}
+.atlas-table th,.atlas-table td{padding:7px 8px;border-bottom:1px solid #dce3df;text-align:left}
+.atlas-table th{font:650 12px/1.3 "Segoe UI",sans-serif;color:var(--muted)}
+.atlas-table td.num,.atlas-table th.num{text-align:right;font-variant-numeric:tabular-nums}
 @media(max-width:750px){.atlas-metrics{grid-template-columns:repeat(2,1fr)}.stMainBlockContainer{padding-top:3rem}.atlas-title h1{font-size:40px}}
 </style>"""
 
@@ -47,18 +51,25 @@ def heading(city):
         <p>{"Central Varanasi · Ganges riverfront and old city" if city == "Varanasi" else "Fictional city · Route planning sandbox"}</p></div>""")
 
 
-def summary(plans, plan, calls, vehicles):
+def _calls_label(count):
+    return f'{count} {"call" if count == 1 else "calls"} covered'
+
+
+def summary(plans, plan, calls, vehicles, active_mode="Optimized"):
+    opt_count = plans["optimized"]["served_count"]
+    greedy_count = plans["greedy"]["served_count"]
     cards = [
         ("Fleet optimum", f'{plans["optimized"]["total_distance_km"]:.2f} km',
-         f'{plans["optimized"]["served_count"]} calls covered'),
+         _calls_label(opt_count), active_mode == "Optimized"),
         ("Nearest-first", f'{plans["greedy"]["total_distance_km"]:.2f} km',
-         f'{plans["greedy"]["served_count"]} calls covered'),
-        ("Incidents covered", f'{plan["served_count"]} / {len(calls)}', "Selected plan"),
-        ("Available units", f'{sum(v["available"] for v in vehicles)} / {len(vehicles)}', "Simulated fleet"),
+         _calls_label(greedy_count), active_mode == "Nearest-first"),
+        ("Incidents covered", f'{plan["served_count"]} / {len(calls)}', "Selected plan", False),
+        ("Available units", f'{sum(v["available"] for v in vehicles)} / {len(vehicles)}', "Simulated fleet", False),
     ]
     st.html('<section class="atlas-metrics">' + "".join(
-        f'<div class="atlas-stat"><span>{label}</span><strong>{value}</strong><small>{detail}</small></div>'
-        for label, value, detail in cards) + '</section>')
+        f'<div class="atlas-stat{" is-active" if active else ""}"><span>{label}</span>'
+        f'<strong>{value}</strong><small>{detail}</small></div>'
+        for label, value, detail, active in cards) + '</section>')
 
 
 def queue_item(call, assignment):
@@ -67,3 +78,19 @@ def queue_item(call, assignment):
     st.html(f'<div class="call-row"><b>{escape(call["id"])}</b>'
             f'<span class="call-kind">{escape(call["type"].title())}</span>'
             f'<div class="call-detail">{escape(detail)}</div></div>')
+
+
+def comparison_table(rows):
+    body = "".join(
+        f'<tr><td><b>{escape(r["Algorithm"])}</b></td>'
+        f'<td class="num">{r["Distance (km)"]:.3f}</td>'
+        f'<td class="num">{r["Nodes expanded"]}</td>'
+        f'<td class="num">{r["Runtime (ms)"]:.2f}</td></tr>'
+        for r in rows
+    )
+    st.html(
+        '<table class="atlas-table"><thead><tr>'
+        '<th>Algorithm</th><th class="num">Dist (km)</th>'
+        '<th class="num">Nodes</th><th class="num">Time (ms)</th>'
+        f'</tr></thead><tbody>{body}</tbody></table>'
+    )

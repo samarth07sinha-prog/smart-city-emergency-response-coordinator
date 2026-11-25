@@ -61,8 +61,8 @@ def street_map(graph, data, vehicles, calls, plan, closures):
                                 fill_color="#%02x%02x%02x" % tuple(item["color"]),
                                 tooltip=item["label"]).add_to(m)
         else:
-            folium.Marker(xy, icon=folium.Icon(color="red", icon="info-sign"),
-                          tooltip=escape(item["label"])).add_to(m)
+            folium.CircleMarker(xy, radius=9, color="#193647", weight=2.5, fill=True, fill_opacity=1,
+                                fill_color="#ff7e56", tooltip=escape(item["label"])).add_to(m)
     if markers:
         m.fit_bounds([item["position"][::-1] for item in markers], padding=(36, 36), max_zoom=16)
     return m
@@ -72,8 +72,8 @@ def city_deck(graph, data, vehicles, calls, plan, closures, camera, buildings):
     scene = city_scene()
     routes, markers = overlays(graph, vehicles, calls, plan)
     x, y = zip(*(item["position"] for item in markers))
-    lon, lat = (min(x) + max(x)) / 2, (min(y) + max(y)) / 2
-    zoom, pitch, bearing = 14.35, 45, -16
+    lon, lat = (min(x) + max(x)) / 2, (min(y) + max(y)) / 2 - 0.0012
+    zoom, pitch, bearing = 13.75, 45, -16
     if camera == "Ghats":
         lat, lon, zoom, pitch, bearing = 25.308, 83.0115, 16.5, 55, -32
     elif camera != "Overview":
@@ -108,8 +108,9 @@ def city_deck(graph, data, vehicles, calls, plan, closures, camera, buildings):
         pdk.Layer("PathLayer", id="closures", data=closed, get_path="path",
                   get_color=[255, 87, 99], get_width=7, width_min_pixels=4),
         pdk.Layer("TextLayer", id="places", data=scene["places"], get_position="position",
-                  get_text="label", get_size=11, get_color=[209, 221, 226], billboard=True,
-                  font_family="'Arial'"),
+                  get_text="label", get_size=11, get_color=[234, 243, 247], billboard=True,
+                  background=True, get_background_color=[17, 30, 42, 170],
+                  background_padding=[3, 1, 3, 1], font_family="'Arial'"),
         pdk.Layer("ScatterplotLayer", id="markers", data=markers, get_position="position",
                   get_fill_color="color", get_line_color=[10, 33, 44], stroked=True,
                   line_width_min_pixels=2, get_radius=9, radius_min_pixels=6),
