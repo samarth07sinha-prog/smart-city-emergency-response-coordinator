@@ -41,12 +41,9 @@ From the project folder with the virtual environment created above:
 
 Open the local URL printed by Streamlit. Switch between nearest-first and
 optimized assignment, add or resolve calls, change vehicle availability, and
-close a route segment to recalculate dispatch. The bundled Varanasi scene
-opens on a fresh checkout. Select **Ghats** or a call in the camera menu to
-inspect an area in 3D, or use **Street map** to place calls by clicking.
-The WebGL scene includes roads, the Ganges, 37,531 building polygons and
-dispatch overlays. Use Shift-drag to orbit and scroll to zoom. Most building
-heights are estimates. See [map data and credits](data/ATTRIBUTION.md).
+close a route segment to recalculate dispatch. The Varanasi road network is bundled. Use the **Street map** to place calls
+or **Replay** to watch assigned units move. The street map background uses
+online OpenStreetMap tiles. See [map data and credits](data/ATTRIBUTION.md).
 
 ## Varanasi road network
 

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="soft" data-buttons="arrow" data-ground="sage">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="page-type" content="software">
+  <meta name="site-kind" content="software">
+  <meta name="theme-color" content="#18191b">
+  <title>Dispatch Atlas | Varanasi dispatch simulator</title>
+  <meta name="description" content="Compare emergency dispatch plans on Varanasi’s road network, replay vehicle movements and try a road closure.">
+  <meta property="og:title" content="Dispatch Atlas">
+  <meta property="og:description" content="Compare emergency dispatch plans on the streets of Varanasi.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="./share.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="./favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400..700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="assets/system.css">
+  <link rel="stylesheet" href="assets/motion/motion.css">
+  <link rel="stylesheet" href="assets/layout/layout.css">
+  <link rel="stylesheet" href="assets/moments/letters-assemble/moment.css">
+  <link rel="stylesheet" href="landing.css">
+  <script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+</head>
+<body>
+<!-- Software. Centred hero, graphite-safety-orange, Familjen + IBM Plex Mono, arrow buttons, ring mark, space rhythm, close-type on footer-dark. The product window uses a locally rendered route study. Letters assemble on the result. -->
+<header class="nav">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><span class="mark" data-mark="ring" aria-hidden="true"></span>Dispatch Atlas</a>
+    <a class="nav__link atlas-result-link" href="#result">See the results</a>
+  </div>
+</header>
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-title">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <h1 id="hero-title">Varanasi dispatch simulator</h1>
+        <p class="hero__lead">2 emergency calls. 4 vehicles. Compare dispatch plans on Varanasi’s streets, then replay the assignments or try a road closure.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="../../../?view=simulator">Open the simulator</a></div>
+      </div>
+      <div class="hero__window atlas-stage" data-visual>
+        <div class="ly-piece app-frame" aria-label="Varanasi dispatch plan comparison">
+          <div class="preview-bar"><span>Varanasi road network</span><span>Simulated calls</span></div>
+          <div class="map-preview" data-map-preview data-plan="both">
+            <div class="preview-tabs" role="group" aria-label="Visible routes">
+              <button type="button" data-plan="both" aria-pressed="true">Both plans</button>
+              <button type="button" data-plan="optimized" aria-pressed="false">Optimized</button>
+              <button type="button" data-plan="nearest" aria-pressed="false">Nearest-first</button>
+            </div>
+            <div class="preview-map">
+              <picture class="map-both">
+                <source media="(max-width: 639px)" srcset="routes-both-mobile.webp" width="592" height="420">
+                <img src="routes-both.webp" alt="Route paths for both plans across central Varanasi" width="1024" height="360" fetchpriority="high">
+              </picture>
+              <picture class="map-optimized">
+                <source media="(max-width: 639px)" srcset="routes-optimized-mobile.webp" width="592" height="420">
+                <img src="routes-optimized.webp" alt="Optimized routes across central Varanasi" width="1024" height="360">
+              </picture>
+              <picture class="map-nearest">
+                <source media="(max-width: 639px)" srcset="routes-nearest-mobile.webp" width="592" height="420">
+                <img src="routes-nearest.webp" alt="Nearest-first routes across central Varanasi" width="1024" height="360">
+              </picture>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+</main>
+<footer id="result" class="closing footer--dark">
+  <div class="wrap">
+    <div class="close-type atlas-close" data-moment="letters-assemble">
+      <h2 class="mo-la__type">Less driving, same calls</h2>
+      <p class="mo-la__sub">Both plans cover the same two calls in the default simulation. Optimized dispatch saves 2.13 km.</p>
+      <dl class="result-plans">
+        <div><dt>Optimized</dt><dd>2.71 km</dd><span aria-hidden="true" class="result-bar optimized"></span></div>
+        <div><dt>Nearest-first</dt><dd>4.84 km</dd><span aria-hidden="true" class="result-bar nearest"></span></div>
+      </dl>
+      <a class="btn btn--primary" href="../../../?view=simulator">Open the simulator</a>
+    </div>
+    <div class="atlas-footer"><span>Dispatch Atlas</span><a class="link" href="https://www.openstreetmap.org/copyright">Map data © OpenStreetMap contributors</a></div>
+  </div>
+</footer>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/moments/moments.js"></script>
+<script type="module" src="map-preview.js"></script>
+</body>
+</html>
